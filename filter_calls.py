@@ -30,6 +30,7 @@ with open(inputvcf, mode = "rt") as in_vcf:
             var_match = line.rstrip(
                 "\t\n").split("\t")
 
+            # Only focus on SNP values
             if not qual == ".":
                 info_dict = {}
                 clinvar_query = []
@@ -62,7 +63,7 @@ with open(inputvcf, mode = "rt") as in_vcf:
                 for i, field in enumerate(line_format):
                     info_dict[field] = var_match[i]
 
-                print(clinvar_query,"\n")
+                print(clinvar_query)
 
                 #calls.update(
                   #  {(chrom, pos): [ref, alt, qual, info_dict, clinvar_query]})
