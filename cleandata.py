@@ -5,6 +5,7 @@ Python script for c-Myc
 import sys
 import subprocess # for running r through later
 import re
+import math
 import csv
 
 psm_file = sys.argv[1]
@@ -16,11 +17,13 @@ def protein_get_name(protein):
 
 class Protein:
     def __init__(self, name, description, gene_name, hours):
-        self.name = name
+        self.name = name # Protein accession
         self.description = description
         self.gene_name = gene_name
         self.hours = hours
 
+    # For double checking: will display the prot accession and description if
+    # called as a string object
     def __str__(self):
         return "{0} {1}".format(self.name, self.description)
 
@@ -30,8 +33,9 @@ class Protein:
     def get_hr(self, hr):
         return self.hours[hr]
 
-    def get_fc(self, hr):
-        return self.hours[hr] / self.hours[0]
+    # Class method to directly access FC log 2
+    def get_fclog2(self, hr):
+        return math.log(self.hours[hr] / self.hours[0], 2)
 
 
 prot_dict = {}
@@ -68,6 +72,7 @@ with open(psm_file) as psm:
         desc = result[0]
         gene = result[1]
 
+        # Storing all timepoints in a dictionary, to be contained w/in object
         hours_all = {0: row[51], 4: row[52], 8: row[53], 12: row[54],
                      24: row[55], 48: row[56]}
 
