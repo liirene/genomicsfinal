@@ -1,6 +1,17 @@
 #! /usr/bin/Rscript
 args = commandArgs(trailingOnly=TRUE)
 
+print_symbols <- function(gene_list){
+  for (i in 1:length(gene_list)){
+    cat("# ",names(gene_list[[i]]),"\n")
+    symbols <- gene_list[[i]][[1]][,2]
+    symbols <- symbols[!is.na(symbols)]
+    for (j in 1:length(symbols)){
+      cat(symbols[j],"\n")
+    }
+  }
+}
+
 # Handling missing and default arguments
 if (length(args)==0) {
   stop("At least one argument must be supplied (input file).\n", call.=FALSE)
@@ -44,7 +55,7 @@ write.csv(keggrespaths_upreg, "upregulated_kegg.csv")
 downreg_gene_list = list()
 # Loop through keggresids to get all 5 pathview pictures (made in directory)
 for (i in 1:length(keggresids_down)){
-  #pathview(gene.data=foldchange, pathway.id= keggresids_down[i], species="mmu", new.signature=FALSE)
+  pathview(gene.data=foldchange, pathway.id= keggresids_down[i], species="mmu", new.signature=FALSE)
   path_name <- paste0(keggrespaths_down$id[i])
   path_to_add <- sigmet.kegg[path_name]
   path_to_add[[1]] <- eg2id(eg = path_to_add[[1]], pkg.name = "org.Mm.eg.db", keep.order = T, na.rm = T)
@@ -59,8 +70,9 @@ for (i in 1:length(keggresids_upreg)){
   path_to_add[[1]] <- eg2id(eg = path_to_add[[1]], pkg.name = "org.Mm.eg.db", keep.order = T, na.rm = T)
   upreg_gene_list[[i]] <- path_to_add
 }
+
 # Fix legend somehow
 
-#upreg_gene_list and downreg_gene_list now contain the IDs of the genes associated in each
-
-return(upreg_gene_list, downreg_gene_list)
+print_symbols(upreg_gene_list)
+cat("\n")
+print_symbols(downreg_gene_list)
