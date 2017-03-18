@@ -1,6 +1,14 @@
 import subprocess
 from typing import Tuple, List, Dict
-def pathway_parse(path_to_script):
+
+Pathway = Dict[str, List[str]]
+
+def __pathway_parse(path_to_script):
+    """
+
+    :param path_to_script:
+    :return:
+    """
     command = 'C:/Program Files/R/R-3.3.2/bin/Rscript.exe'
     args = ['clean_data.csv']
     cmd = [command, path_to_script] + args
@@ -9,7 +17,12 @@ def pathway_parse(path_to_script):
     return x
 
 # Upreg is before downreg
-def split_r_output(output_lines: List[str]) -> Tuple[List[str], List[str]]:
+def __split_r_output(output_lines: List[str]) -> Tuple[List[str], List[str]]:
+    """
+
+    :param output_lines:
+    :return:
+    """
     upreg = []
     downreg = []
     is_upreg = True
@@ -22,7 +35,12 @@ def split_r_output(output_lines: List[str]) -> Tuple[List[str], List[str]]:
             downreg.append(line)
     return (upreg, downreg)
 
-def parse_gene_list(gene_list: List[str]) -> Dict[str, List[str]]:
+def __parse_gene_list(gene_list: List[str]) -> Pathway:
+    """
+
+    :param gene_list:
+    :return:
+    """
     pathways = {}
     current_pathway = ""
     for line in gene_list:
@@ -35,13 +53,15 @@ def parse_gene_list(gene_list: List[str]) -> Dict[str, List[str]]:
     return pathways
 
 
-output = pathway_parse('pathwayscript.R')
-#print(output)
-output_lines = output.split("\n")
-output_lines = list(filter(lambda line: line.startswith("[1]") is False, output_lines))
-upreg, downreg = split_r_output(output_lines)
-upreg_pathways = parse_gene_list(upreg)
-downreg_pathways = parse_gene_list(downreg)
+def pathway_analysis(path_to_script: str) -> Tuple(Pathway, Pathway):
+    output = __pathway_parse(path_to_script)
+    output_lines = output.split("\n")
+    output_lines = list(filter(lambda line: line.startswith("[1]") is False, output_lines))
+    upreg, downreg = __split_r_output(output_lines)
+    upreg_pathways = __parse_gene_list(upreg)
+    downreg_pathways = __parse_gene_list(downreg)
+    return (upreg_pathways, downreg_pathways)
+
 
 # Do this for each group of pathways that you're interested in (1 figure for
 # each group of pathways)
