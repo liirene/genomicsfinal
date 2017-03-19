@@ -1,9 +1,12 @@
 """
 Python script for c-Myc
-"""
 
-# TODO:Docstrings
-# TODO: Type your stuff properly :P
+Master script designed to be used in conjunction with R_pull.py and create_
+plots.py, and located in the same directory as these files.
+
+Generates pathway images, regression plots,
+
+"""
 
 import sys
 import re
@@ -45,20 +48,24 @@ class Protein:
 
 def get_first_protein_accession(raw_accessions: str):
     """
-
-    :param raw_accessions:
-    :return:
+    Parses the raw accession, which may include ; or whitespace artifacts.
+    :param raw_accessions: Provide the raw raw protein accession as a string
+    :return: Cleaned accession without artifacts
     """
     return re.match("(^.*?)(?=(?:;|\s|$))", raw_accessions).group(0)
 
 
 def plot_pathways(pathway_set, is_upreg: bool, foldchange_hr: int):
     """
+    Works w/ create_plots.py to plot all proteins provided to the program
 
-    :param foldchange_hr:
-    :param pathway_set:
-    :param is_upreg:
-    :return:
+    :param foldchange_hr: Foldchange on which to determine the significantly
+     changed protein set
+    :param pathway_set: genes present in the pathway of interest
+    :param is_upreg: Is this an upregulated or downregulated pathway set?
+    :return: Saves 1 image for each pathway to file of the 9 differentially
+    expressed proteins within that set.
+
     """
     for pathway, genes in pathway_set.items():
         geneset = set(genes)
@@ -69,7 +76,6 @@ def plot_pathways(pathway_set, is_upreg: bool, foldchange_hr: int):
         top_9 = sorted(list(intersect_genes),
                        key=lambda x: prot_dict[x].get_fclog2(foldchange_hr),
                        reverse=is_upreg)[:9]
-
 
         create_plots.plot(prot_dict, top_9, pathway, is_upreg)
 
@@ -84,6 +90,7 @@ with open(psm_file) as psm:
 
     next(psmreader)  # Skip header
     for row in psmreader:
+
         # Parse protein accession
         raw_prot_accession = row[12]
         if raw_prot_accession == "sp":
@@ -92,7 +99,7 @@ with open(psm_file) as psm:
             continue
         mast_prot_accession = get_first_protein_accession(raw_prot_accession)
 
-        # Parse description
+        # Parse description to pull out gene name and protein description
         full_desc = row[14]
         results = re.findall("(^.+?)(?:OS.+?GN=)(.+?)(?:;|\s)", full_desc)
         if len(results) == 0:
@@ -129,10 +136,12 @@ with open(cleaned_csv_name, 'w') as newfile:
         line_to_write += spread_fc
         writefile.writerow(line_to_write)
 
+# Streams the input through R and generates pathways significantly impacted
+# after 48 h time points.
 upreg, downreg = R_pull.pathway_analysis(sys.argv[1], 'pathwayscript.R')
 
+# Generates a list of genes available within the dataset
 available_genes = set(prot_dict.keys())
-
 
 plot_pathways(upreg, True, 48)
 plot_pathways(downreg, False, 48)
