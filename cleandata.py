@@ -7,9 +7,9 @@ import re
 import math
 import csv
 import R_pull
+import create_plots
 #import matplotlib.pyplot as plt
 #import numpy as np
-import subprocess
 
 class Protein:
     def __init__(self, name, description, gene_name, hours):
@@ -30,6 +30,8 @@ class Protein:
     # Class method to directly access FC log 2
     def get_fclog2(self, hr):
         return math.log(self.get_hr(hr) / self.get_hr(0), 2)
+    def get_hours_fclog2(self):
+        return list(map(lambda hour: self.get_fclog2(hour), [0,4,8,12,24,48]))
 
 
 def get_first_protein_accession(raw_accessions):
@@ -81,8 +83,7 @@ with open(psm_file) as psm:
         if data_valid is False:
             continue
 
-        prot_dict[mast_prot_accession] = Protein(mast_prot_accession, desc,
-                                                 gene, hours_all)
+        prot_dict[gene] = Protein(mast_prot_accession, desc, gene, hours_all)
 
 
 with open(cleaned_csv_name, 'w') as newfile:
@@ -99,5 +100,22 @@ with open(cleaned_csv_name, 'w') as newfile:
         writefile.writerow(line_to_write)
 
 upreg, downreg = R_pull.pathway_analysis('pathwayscript.R')
+
+available_genes = set(prot_dict.keys())
+
+# JUST UPREG
+for pathway, genes in upreg.items():
+    geneset = set(genes)
+    intersect_genes = create_plots.search_current_data(available_genes,
+                                                       geneset)
+    # Find top genes in intersect_genes by fold change
+    # Top 9 upregulated
+    top_9_upreg = sorted(list(intersect_genes),
+                         key=lambda x:prot_dict[x].get_fclog2(48),
+                         reverse=True)[:9]
+
+    create_plots.plot(prot_dict, top_9_upreg, pathway)
+
+
 
 

@@ -53,7 +53,12 @@ def __parse_gene_list(gene_list: List[str]) -> Pathway:
     return pathways
 
 
-def pathway_analysis(path_to_script: str) -> Tuple(Pathway, Pathway):
+def pathway_analysis(path_to_script: str) -> Tuple[Pathway, Pathway]:
+    """
+
+    :param path_to_script:
+    :return:
+    """
     output = __pathway_parse(path_to_script)
     output_lines = output.split("\n")
     output_lines = list(filter(lambda line: line.startswith("[1]") is False, output_lines))
@@ -76,7 +81,6 @@ def pathway_analysis(path_to_script: str) -> Tuple(Pathway, Pathway):
                                                                       #squeeze=False,
                                                                       #sharey='row')
 
-#plt.suptitle(title, fontsize=12)
 
 # include however many you want w/in the tuple
 
