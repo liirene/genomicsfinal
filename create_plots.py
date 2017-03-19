@@ -15,7 +15,8 @@ def search_current_data(available_genes: Set[str],
     return available_genes.intersection(genes_in_pathway)
 
 
-def plot_protein(protein, subplot):  # Gene name is a protein object from cleandata.py
+# Gene name is a protein object from cleandata.py
+def plot_protein(protein, subplot):
     # Will return one subplot object at a time
 
     make_subplot(subplot, protein.get_gene_name(), protein.get_hours_fclog2())
@@ -30,18 +31,18 @@ def plot(full_protdict: Dict, prots_to_plot: List[str], pathway_name: str,
                      subplots[int(i / 3)][i % 3])
 
     file_prefix = "upreg_"
-    if (is_upreg is False):
+    if is_upreg is False:
         file_prefix = "downreg_"
     fig.savefig(file_prefix + pathway_name + '.png', dpi=200)
 
 
-def make_subplot(subplot, gene_name, y, num=3,
-                 x=np.array([0, 4, 8, 12, 24, 48]), ylabel='Log2 Fold Change'):
+def make_subplot(subplot, gene_name, y, x=np.array([0, 4, 8, 12, 24, 48]),
+                 ylabel='Log2 Fold Change'):
     """
 
-    :param prot_name:
+    :param subplot:
+    :param gene_name:
     :param y:
-    :param num:
     :param x:
     :param ylabel:
     :return:
@@ -51,21 +52,23 @@ def make_subplot(subplot, gene_name, y, num=3,
     subplot.set_title(gene_name)
     subplot.set_ylabel(ylabel)
     subplot.set_ylim(0, max(y) + 1)
+
+    # TODO: Specify subplot colors and extend axes
     __calc_regression(x, y, subplot)
 
 
 def __create_master(title: str):  # Subplot is a list of plotting objects
     """
 
-    :param subplots:
+    :param title:
     :return:
     """
-    fig, ax = plt.subplots(3, 3, squeeze=False,
-                           sharex='row')  # initializes figure and axes object
+    # initializes figure and axes object
+    fig, ax = plt.subplots(3, 3, squeeze=False, sharex='row')
     plt.suptitle(title, fontsize=12)
     plt.xlim(0, 50.0)
     plt.xlabel('Hours')
-    return (fig, ax)
+    return fig, ax
 
 
 def __calc_regression(x, y, subplot):
@@ -73,11 +76,13 @@ def __calc_regression(x, y, subplot):
 
     :param x:
     :param y:
-    :param degree:
+    :param subplot:
     :return:
     """
     fit = np.polyfit(x=x, y=y, deg=2)
     # figure this out here
+
+    # TODO: Calculate R values and other parameters
 
     subplot.plot(x, fit[0] * x ** 2 + fit[1] * x ** 1 + fit[2], color='blue')
 

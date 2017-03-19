@@ -35,7 +35,7 @@ def __split_r_output(output_lines: List[str]) -> Tuple[List[str], List[str]]:
             upreg.append(line)
         else:
             downreg.append(line)
-    return (upreg, downreg)
+    return upreg, downreg
 
 
 def __parse_gene_list(gene_list: List[str]) -> Pathway:
@@ -56,9 +56,11 @@ def __parse_gene_list(gene_list: List[str]) -> Pathway:
     return pathways
 
 
-def pathway_analysis(path_to_rscript: str, path_to_script: str) -> Tuple[Pathway, Pathway]:
+def pathway_analysis(path_to_rscript: str, path_to_script: str) -> \
+        Tuple[Pathway, Pathway]:
     """
 
+    :param path_to_rscript:
     :param path_to_script:
     :return:
     """
@@ -69,4 +71,4 @@ def pathway_analysis(path_to_rscript: str, path_to_script: str) -> Tuple[Pathway
     upreg, downreg = __split_r_output(output_lines)
     upreg_pathways = __parse_gene_list(upreg)
     downreg_pathways = __parse_gene_list(downreg)
-    return (upreg_pathways, downreg_pathways)
+    return upreg_pathways, downreg_pathways

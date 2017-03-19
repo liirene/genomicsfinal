@@ -11,7 +11,8 @@ import create_plots
 
 # This is run in Windows console?
 
-# Command is python cleandata.py C:/Program Files/R/R-3.3.2/bin/Rscript.exe 90mfull_PSM.csv
+# Command is python cleandata.py C:/Program Files/R/R-3.3.2/bin/Rscript.exe
+#  90mfull_PSM.csv
 # Linux is python cleandata.py Rscript 90full_PSM.csv
 
 
@@ -37,7 +38,7 @@ class Protein:
 
     def get_hours_fclog2(self):
         return list(
-            map(lambda hour: self.get_fclog2(hour), [0, 4, 8, 12, 24, 48]))
+            map(lambda hrlog2: self.get_fclog2(hrlog2), [0, 4, 8, 12, 24, 48]))
 
 
 def get_first_protein_accession(raw_accessions):
@@ -83,7 +84,7 @@ with open(psm_file) as psm:
         data_valid = True
         for i, time in enumerate(timepoints):
             hour = row[51 + i]
-            if (hour == ""):
+            if hour == "":
                 data_valid = False
                 break
             hours_all[time] = hour
@@ -111,6 +112,12 @@ available_genes = set(prot_dict.keys())
 
 
 def plot_pathways(pathway_set, is_upreg: bool):
+    """
+
+    :param pathway_set:
+    :param is_upreg:
+    :return:
+    """
     for pathway, genes in pathway_set.items():
         geneset = set(genes)
         intersect_genes = create_plots.search_current_data(available_genes,
