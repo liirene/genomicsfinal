@@ -16,9 +16,6 @@ def __pathway_parse(path_to_rscript: str, path_to_script: str):
     return x
 
 
-# Upreg is before downreg
-
-
 def __split_r_output(output_lines: List[str]) -> Tuple[List[str], List[str]]:
     """
 

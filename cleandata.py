@@ -2,6 +2,9 @@
 Python script for c-Myc
 """
 
+# TODO:Docstrings
+# TODO: Type your stuff properly :P
+
 import sys
 import re
 import math
@@ -17,7 +20,7 @@ import create_plots
 
 
 class Protein:
-    def __init__(self, name, description, gene_name, hours):
+    def __init__(self, name: str, description: str, gene_name: str, hours):
         self.name = name  # Protein accession
         self.description = description
         self.gene_name = gene_name
@@ -50,11 +53,34 @@ def get_first_protein_accession(raw_accessions):
     return re.match("(^.*?)(?=(?:;|\s|$))", raw_accessions).group(0)
 
 
+def plot_pathways(pathway_set, is_upreg: bool):
+    """
+
+    :param pathway_set:
+    :param is_upreg:
+    :return:
+    """
+    for pathway, genes in pathway_set.items():
+        geneset = set(genes)
+        intersect_genes = create_plots.search_current_data(available_genes,
+                                                           geneset)
+        # Find top genes in intersect_genes by fold change
+        # Top 9 upregulated
+        top_9 = sorted(list(intersect_genes),
+                       key=lambda x: prot_dict[x].get_fclog2(48),
+                       reverse=is_upreg)[:9]
+
+        # TODO: put argument whether it's upreg or downreg so that it will be
+        #  saved within the title
+
+        create_plots.plot(prot_dict, top_9, pathway, is_upreg)
+
+
 psm_file = sys.argv[2]
 # psm_file = sys.argv[1]     INCLUDE THSI AGAIN
 prot_dict = {}
 timepoints = [0, 4, 8, 12, 24, 48]
-cleaned_csv_name = "clean_data.csv"
+cleaned_csv_name = "clean_data.csv"  # TODO: Remove this?
 
 with open(psm_file) as psm:
     psmreader = csv.reader(psm)
@@ -109,29 +135,6 @@ with open(cleaned_csv_name, 'w') as newfile:
 upreg, downreg = R_pull.pathway_analysis(sys.argv[1], 'pathwayscript.R')
 
 available_genes = set(prot_dict.keys())
-
-
-def plot_pathways(pathway_set, is_upreg: bool):
-    """
-
-    :param pathway_set:
-    :param is_upreg:
-    :return:
-    """
-    for pathway, genes in pathway_set.items():
-        geneset = set(genes)
-        intersect_genes = create_plots.search_current_data(available_genes,
-                                                           geneset)
-        # Find top genes in intersect_genes by fold change
-        # Top 9 upregulated
-        top_9 = sorted(list(intersect_genes),
-                       key=lambda x: prot_dict[x].get_fclog2(48),
-                       reverse=is_upreg)[:9]
-
-        # TODO: put argument whether it's upreg or downreg so that it will be
-        #  saved within the title
-
-        create_plots.plot(prot_dict, top_9, pathway, is_upreg)
 
 
 plot_pathways(upreg, True)
