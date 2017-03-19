@@ -55,7 +55,7 @@ write.csv(keggrespaths_upreg, "upregulated_kegg.csv")
 downreg_gene_list = list()
 # Loop through keggresids to get all 5 pathview pictures (made in directory)
 for (i in 1:length(keggresids_down)){
-  #pathview(gene.data=foldchange, pathway.id= keggresids_down[i], species="mmu", new.signature=FALSE)
+  pathview(gene.data=foldchange, pathway.id= keggresids_down[i], species="mmu", new.signature=FALSE)
   path_name <- paste0(keggrespaths_down$id[i])
   path_to_add <- sigmet.kegg[path_name]
   path_to_add[[1]] <- eg2id(eg = path_to_add[[1]], pkg.name = "org.Mm.eg.db", keep.order = T, na.rm = T)
@@ -64,7 +64,7 @@ for (i in 1:length(keggresids_down)){
 
 upreg_gene_list = list()
 for (i in 1:length(keggresids_upreg)){
-  #pathview(gene.data=foldchange, pathway.id= keggresids_upreg[i], species="mmu", new.signature=FALSE)
+  pathview(gene.data=foldchange, pathway.id= keggresids_upreg[i], species="mmu", new.signature=FALSE)
   path_name <- paste0(keggrespaths_upreg$id[i])
   path_to_add <- sigmet.kegg[path_name]
   path_to_add[[1]] <- eg2id(eg = path_to_add[[1]], pkg.name = "org.Mm.eg.db", keep.order = T, na.rm = T)
