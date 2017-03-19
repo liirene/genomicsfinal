@@ -4,6 +4,7 @@ create_plots.py
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 from typing import Set, Dict, List
 
 
@@ -16,10 +17,10 @@ def search_current_data(available_genes: Set[str],
 
 
 # Gene name is a protein object from cleandata.py
-def plot_protein(protein, subplot, is_upreg):
+def plot_protein(protein, subplot, is_upreg: bool):
     # Will return one subplot object at a time
 
-    make_subplot(subplot, protein.get_gene_name(), protein.get_hours_fclog2(),
+    make_subplot(subplot, protein.get_gene_name(), protein.get_all_fclog2(),
                  is_upreg)
 
 
@@ -34,6 +35,10 @@ def plot(full_protdict: Dict, prots_to_plot: List[str], pathway_name: str,
         plot_protein(full_protdict[prots_to_plot[i]],
                      subplots[int(i / 3)][i % 3], is_upreg)
 
+    line1 = mlines.Line2D([], [], linewidth=2, color='b')
+    plt.figlegend(handles=[line1], labels=['2nd Deg \nRegression'],
+                  loc='lower right', fontsize=8)
+
     plt.subplots_adjust(hspace=0.4, wspace=0.40)
 
     fig.savefig(file_prefix + pathway_name + '.png', dpi=300)
@@ -41,10 +46,11 @@ def plot(full_protdict: Dict, prots_to_plot: List[str], pathway_name: str,
     # TODO: Add a legend
 
 
-def make_subplot(subplot, gene_name: str, y, is_upreg: bool,
+def make_subplot(subplot, gene_name: str, y: List[int], is_upreg: bool,
                  x=np.array([0, 4, 8, 12, 24, 48])):
     """
 
+    :param is_upreg:
     :param subplot:
     :param gene_name:
     :param y:
@@ -91,6 +97,7 @@ def __create_master(title: str):  # Subplot is a list of plotting objects
     fig.text(x=.04, y=.6, s='Log2 Fold Change', size=10, rotation='vertical',
              weight='semibold')
 
+
     return fig, ax
 
 
@@ -103,16 +110,4 @@ def __calc_regression(x, y, subplot):
     :return:
     """
     fit = np.polyfit(x=x, y=y, deg=2)
-
-    # TODO: Calculate R values and other parameters
-
     subplot.plot(x, fit[0] * x ** 2 + fit[1] * x ** 1 + fit[2], lw=0.5, c='b')
-
-    # subplot.plot(x, fit[0] * x ** 3 + fit[1] * x ** 2 + fit[2] * x + fit[3],
-    # color='blue')  # add regression line to plot
-
-# calculate coefficients and store them: array outputs are:
-# polynomial coeffs, highest power first (3,2,1,0)
-
-
-# plt.close('fig')
